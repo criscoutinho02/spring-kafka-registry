@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Implementation-Title: spring-kafka-registry
+Implementation-Version: 1.0-SNAPSHOT
+Built-By: crisc
+Implementation-Vendor-Id: com.sunilvb
+Build-Jdk: 1.8.0_241
+Implementation-URL: https://projects.spring.io/spring-boot/#/spring-bo
+ ot-starter-parent/SpringKafkaRegistry
+Created-By: Maven Integration for Eclipse
+

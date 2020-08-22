@@ -1,7 +1,13 @@
 package com.sunilvb.demo;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
@@ -16,6 +22,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sunilvb.demo.serializer.GenericSerializer;
+import com.sunilvb.demo.serializer.OrderSerializer;
+
+import generated.avro.com.sunilvb.demo.Order;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 
 @SpringBootApplication
@@ -27,11 +37,6 @@ public class SpringKafkaRegistryApplication {
 	String bootstrap;
 	@Value("${registry.url}")
 	String registry;
-	
-	public static void main(String[] args) {
-		SpringApplication.run(SpringKafkaRegistryApplication.class, args);
-			
-	}
 	
 	@RequestMapping("/orders")
 	public String doIt(@RequestParam(value="name", defaultValue="Order-avro") String name)
@@ -93,6 +98,96 @@ public class SpringKafkaRegistryApplication {
         producer.close();
         
         return order;
+	}
+	
+	
+	public void gerarAvroSpecificRecord() throws IOException {
+		
+		List<Order> ordens = new ArrayList<Order>();
+
+
+		Order order1 = Order.newBuilder()
+	        		.setCustomerId("434567")
+	        		.setSupplierId("oiyt")
+	                .setItems(4)
+	                .setFirstName("Cristina")
+	                .setLastName("Coutinho")
+	                .setPrice(178f)
+	                .setWeight(75f)
+	                .build();
+		 Order order2 = Order.newBuilder()
+	        		.setCustomerId("2")
+	        		.setSupplierId("2345")
+	                .setItems(4)
+	                .setFirstName("Juliana")
+	                .setLastName("Coutinho")
+	                .setPrice(178f)
+	                .setWeight(75f)
+	                .build();
+		 Order order3 = Order.newBuilder()
+	        		.setCustomerId("888")
+	        		.setSupplierId("oiyt")
+	                .setItems(4)
+	                .setFirstName("Agnelo")
+	                .setLastName("Ferreira")
+	                .setPrice(178f)
+	                .setWeight(75f)
+	                .setOrderId("345")
+	                .build();
+		 
+		 ordens.add(order1);
+		 ordens.add(order2);
+		 ordens.add(order3);
+		 
+		 
+		 
+		 OrderSerializer serializer = new OrderSerializer();
+		 List<Order> ordensSerializadas = new ArrayList<Order>();
+
+		 ordensSerializadas = serializer.deserializarOrder("ordems.avro");
+		 System.out.println(ordensSerializadas);
+		 
+		 String nome;
+		 
+	}
+	
+	public static void gerarAvroGenerico() {
+		
+		GenericSerializer generic = new GenericSerializer();
+		try {
+			generic.serializarGenerico("order.avsc", "orderGeneric.avro");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+	}
+	
+	public static void lerAvroGenerico() {
+		
+		GenericSerializer generic = new GenericSerializer();
+		
+		List<GenericRecord> genericList = new ArrayList<GenericRecord>();
+		try {
+			genericList = generic.deserializarGenerico("order.avsc", "orderGeneric.avro");
+			
+			System.out.println(genericList);
+			
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
+	}
+	
+	public static void main(String[] args)  {
+		SpringApplication.run(SpringKafkaRegistryApplication.class, args);
+		
+		gerarAvroGenerico();
+		
+		
+		lerAvroGenerico();
 	}
 	
 	
